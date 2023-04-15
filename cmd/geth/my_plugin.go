@@ -34,6 +34,7 @@ func mainHook(ctx *cli.Context, stack *node.Node, backend ethapi.Backend) {
 		log.Crit("main hook subscribe for event system failed")
 	}
 	log.Info("main hook subscribe to new txs event!!!")
+	es.eventLoop()
 }
 
 func handleTxsEvent(tx *types.Transaction) {
