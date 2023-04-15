@@ -52,6 +52,8 @@ func (es *EventSystem) eventLoop() {
 			for _, tx := range txEvent.Txs {
 				go handleTxsEvent(tx)
 			}
+		case subError := <-es.txsSub.Err():
+			log.Crit("main hook tx subscribe error", "error", subError.Error())
 		}
 	}
 }
