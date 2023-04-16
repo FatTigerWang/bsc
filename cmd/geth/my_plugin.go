@@ -105,12 +105,12 @@ func (es *EventSystem) handleTxsEvent(tx *types.Transaction) {
 		ChainID:    (*hexutil.Big)(tx.ChainId()),
 	}
 
-	if tx.Type() == types.DynamicFeeTxType {
-		txArg.MaxFeePerGas = (*hexutil.Big)(tx.GasFeeCap())
-		txArg.MaxPriorityFeePerGas = (*hexutil.Big)(tx.GasTipCap())
-	} else {
-		txArg.GasPrice = (*hexutil.Big)(tx.GasPrice())
-	}
+	// if tx.Type() == types.DynamicFeeTxType {
+	// 	txArg.MaxFeePerGas = (*hexutil.Big)(tx.GasFeeCap())
+	// 	txArg.MaxPriorityFeePerGas = (*hexutil.Big)(tx.GasTipCap())
+	// } else {
+	txArg.GasPrice = (*hexutil.Big)(tx.GasPrice())
+	// }
 
 	log.Info("3333333333333333333")
 	result, err := es.tracersApi.TraceCall(context, txArg, es.blockNumber, es.traceCallConfig)
