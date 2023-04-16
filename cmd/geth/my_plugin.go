@@ -93,19 +93,25 @@ func (es *EventSystem) handleTxsEvent(tx *types.Transaction) {
 	access := tx.AccessList()
 	log.Info("22222222222222222222")
 	// apis := ethapi.GetAPIs(backend)
+
 	txArg := ethapi.TransactionArgs{
-		From:                 &from,
-		To:                   tx.To(),
-		Gas:                  &gas,
-		GasPrice:             (*hexutil.Big)(tx.GasPrice()),
-		MaxFeePerGas:         (*hexutil.Big)(tx.GasFeeCap()),
-		MaxPriorityFeePerGas: (*hexutil.Big)(tx.GasTipCap()),
-		Value:                (*hexutil.Big)(tx.Value()),
-		Nonce:                &nonce,
-		Input:                &input,
-		AccessList:           &access,
-		ChainID:              (*hexutil.Big)(tx.ChainId()),
+		From:       &from,
+		To:         tx.To(),
+		Gas:        &gas,
+		Value:      (*hexutil.Big)(tx.Value()),
+		Nonce:      &nonce,
+		Input:      &input,
+		AccessList: &access,
+		ChainID:    (*hexutil.Big)(tx.ChainId()),
 	}
+
+	if tx.Type() == types.DynamicFeeTxType {
+		txArg.MaxFeePerGas = (*hexutil.Big)(tx.GasFeeCap())
+		txArg.MaxPriorityFeePerGas = (*hexutil.Big)(tx.GasTipCap())
+	} else {
+		txArg.GasPrice = (*hexutil.Big)(tx.GasPrice())
+	}
+
 	log.Info("3333333333333333333")
 	result, err := es.tracersApi.TraceCall(context, txArg, es.blockNumber, es.traceCallConfig)
 	log.Info("444444444444444444")
