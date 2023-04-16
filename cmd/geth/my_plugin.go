@@ -76,7 +76,7 @@ func mainHook(ctx *cli.Context, stack *node.Node, backend ethapi.Backend) {
 }
 
 func (es *EventSystem) handleTxsEvent(tx *types.Transaction) {
-	log.Info("main hook received new tx", "txHash", tx.Hash())
+	// log.Info("main hook received new tx", "txHash", tx.Hash())
 
 	context := context.Background()
 
@@ -117,6 +117,7 @@ func (es *EventSystem) handleTxsEvent(tx *types.Transaction) {
 		log.Crit("main hook failed to unmarshal result %v", "error", err)
 		return
 	}
+	log.Info("exec completed")
 	log.Info("main hook", "value", have)
 }
 
