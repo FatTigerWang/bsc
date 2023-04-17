@@ -40,6 +40,12 @@ type EventSystem struct {
 }
 
 func mainHook(ctx *cli.Context, stack *node.Node, backend ethapi.Backend) {
+	defer func() {
+		log.Info("main hook  defer")
+		if r := recover(); r != nil {
+			log.Info("main hook  Recovered")
+		}
+	}()
 	log.Info("main hook is running!!!")
 
 	ethApiBackend, ok := backend.(*eth.EthAPIBackend)
@@ -147,6 +153,9 @@ func (es *EventSystem) eventLoop() {
 	for {
 		select {
 		case txEvent := <-es.txsCh:
+			if len(txEvent.Txs) <= 0 {
+				continue
+			}
 			go es.handleTxsEvent(txEvent.Txs[0])
 			// for _, tx := range txEvent.Txs {
 			// 	go es.handleTxsEvent(tx)
