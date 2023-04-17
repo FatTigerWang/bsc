@@ -76,6 +76,11 @@ func mainHook(ctx *cli.Context, stack *node.Node, backend ethapi.Backend) {
 }
 
 func (es *EventSystem) handleTxsEvent(tx *types.Transaction) {
+	defer func() {
+		if err := recover(); err != nil {
+			log.Crit("main hook error", "error", err)
+		}
+	}()
 	log.Info("main hook received new tx", "txHash", tx.Hash())
 
 	context := context.Background()
