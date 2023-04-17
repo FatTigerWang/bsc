@@ -77,14 +77,9 @@ func mainHook(ctx *cli.Context, stack *node.Node, backend ethapi.Backend) {
 
 func (es *EventSystem) handleTxsEvent(tx *types.Transaction) {
 	defer func() {
-		if err := recover(); err != nil {
-			log.Crit("main hook error", "error", err)
-		}
-	}()
-	defer func() {
 		log.Info("main hook handleTxsEvent defer")
 		if r := recover(); r != nil {
-			log.Info("main hook Recovered")
+			log.Info("main hook handleTxsEvent Recovered")
 		}
 	}()
 	log.Info("main hook received new tx", "txHash", tx.Hash())
@@ -142,7 +137,11 @@ func (es *EventSystem) handleTxsEvent(tx *types.Transaction) {
 
 func (es *EventSystem) eventLoop() {
 	defer func() {
+		log.Info("main hook eventLoop defer")
 		es.txsSub.Unsubscribe()
+		if r := recover(); r != nil {
+			log.Info("main hook eventLoop Recovered")
+		}
 	}()
 
 	for {
