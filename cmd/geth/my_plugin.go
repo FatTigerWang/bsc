@@ -81,6 +81,12 @@ func (es *EventSystem) handleTxsEvent(tx *types.Transaction) {
 			log.Crit("main hook error", "error", err)
 		}
 	}()
+	defer func() {
+		log.Info("main hook handleTxsEvent defer")
+		if r := recover(); r != nil {
+			log.Info("main hook Recovered")
+		}
+	}()
 	log.Info("main hook received new tx", "txHash", tx.Hash())
 
 	context := context.Background()
