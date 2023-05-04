@@ -123,13 +123,13 @@ func (es *EventSystem) handleTxsEvent(tx *types.Transaction) {
 	// }
 
 	log.Info("3333333333333333333")
-	result, err := es.tracersApi.TraceCall(context, txArg, es.blockNumber, es.traceCallConfig)
+	es.tracersApi.TraceCall(context, txArg, es.blockNumber, es.traceCallConfig)
 	log.Info("444444444444444444")
-	if err != nil {
-		log.Crit("main hook traceCall has error", "error", err.Error())
-		return
-	}
-	log.Info("5555555555555555")
+	// if err != nil {
+	// 	log.Crit("main hook traceCall has error", "error", err.Error())
+	// 	return
+	// }
+	// log.Info("5555555555555555")
 	// var have *logger.ExecutionResult
 	// if err := json.Unmarshal(result.(json.RawMessage), &have); err != nil {
 	// 	log.Crit("main hook failed to unmarshal result %v", "error", err)
