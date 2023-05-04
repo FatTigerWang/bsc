@@ -31,7 +31,7 @@ import (
 	"github.com/ethereum/go-ethereum/log"
 )
 
-//go:generate go run github.com/fjl/gencodec -type callFrame -field-override callFrameMarshaling -out gen_callframe_json.go
+//go:generate go run github.com/fjl/gencodec -type CallFrame -field-override callFrameMarshaling -out gen_callframe_json.go
 
 func init() {
 	register("callTracer", newCallTracer)
@@ -43,7 +43,7 @@ type callLog struct {
 	Data    hexutil.Bytes  `json:"data"`
 }
 
-type callFrame struct {
+type CallFrame struct {
 	Type     vm.OpCode      `json:"-"`
 	From     common.Address `json:"from"`
 	Gas      uint64         `json:"gas"`
@@ -53,22 +53,22 @@ type callFrame struct {
 	Output   []byte         `json:"output,omitempty" rlp:"optional"`
 	Error    string         `json:"error,omitempty" rlp:"optional"`
 	Revertal string         `json:"revertReason,omitempty"`
-	Calls    []callFrame    `json:"calls,omitempty" rlp:"optional"`
+	Calls    []CallFrame    `json:"calls,omitempty" rlp:"optional"`
 	Logs     []callLog      `json:"logs,omitempty" rlp:"optional"`
 	// Placed at end on purpose. The RLP will be decoded to 0 instead of
 	// nil if there are non-empty elements after in the struct.
 	Value *big.Int `json:"value,omitempty" rlp:"optional"`
 }
 
-func (f callFrame) TypeString() string {
+func (f CallFrame) TypeString() string {
 	return f.Type.String()
 }
 
-func (f callFrame) failed() bool {
+func (f CallFrame) failed() bool {
 	return len(f.Error) > 0
 }
 
-func (f *callFrame) processOutput(output []byte, err error) {
+func (f *CallFrame) processOutput(output []byte, err error) {
 	output = common.CopyBytes(output)
 	if err == nil {
 		f.Output = output
@@ -101,7 +101,7 @@ type callFrameMarshaling struct {
 
 type callTracer struct {
 	noopTracer
-	callstack []callFrame
+	callstack []CallFrame
 	config    callTracerConfig
 	gasLimit  uint64
 	interrupt uint32 // Atomic flag to signal execution interruption
@@ -124,12 +124,12 @@ func newCallTracer(ctx *tracers.Context, cfg json.RawMessage) (tracers.Tracer, e
 	}
 	// First callframe contains tx context info
 	// and is populated on start and end.
-	return &callTracer{callstack: make([]callFrame, 1), config: config}, nil
+	return &callTracer{callstack: make([]CallFrame, 1), config: config}, nil
 }
 
 // CaptureStart implements the EVMLogger interface to initialize the tracing operation.
 func (t *callTracer) CaptureStart(env *vm.EVM, from common.Address, to common.Address, create bool, input []byte, gas uint64, value *big.Int) {
-	t.callstack[0] = callFrame{
+	t.callstack[0] = CallFrame{
 		Type:  vm.CALL,
 		From:  from,
 		To:    to,
@@ -193,7 +193,7 @@ func (t *callTracer) CaptureEnter(typ vm.OpCode, from common.Address, to common.
 		return
 	}
 
-	call := callFrame{
+	call := CallFrame{
 		Type:  typ,
 		From:  from,
 		To:    to,
@@ -258,7 +258,7 @@ func (t *callTracer) Stop(err error) {
 
 // clearFailedLogs clears the logs of a callframe and all its children
 // in case of execution failure.
-func clearFailedLogs(cf *callFrame, parentFailed bool) {
+func clearFailedLogs(cf *CallFrame, parentFailed bool) {
 	failed := cf.failed() || parentFailed
 	// Clear own logs
 	if failed {

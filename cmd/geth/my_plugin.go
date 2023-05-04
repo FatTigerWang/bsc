@@ -9,7 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/eth"
 	"github.com/ethereum/go-ethereum/eth/tracers"
-	"github.com/ethereum/go-ethereum/eth/tracers/logger"
+	"github.com/ethereum/go-ethereum/eth/tracers/native"
 	"github.com/ethereum/go-ethereum/event"
 	"github.com/ethereum/go-ethereum/internal/ethapi"
 	"github.com/ethereum/go-ethereum/log"
@@ -132,7 +132,8 @@ func (es *EventSystem) handleTxsEvent(tx *types.Transaction) {
 		return
 	}
 	log.Info("5555555555555555")
-	var have *logger.ExecutionResult
+	var have *native.CallFrame
+	log.Info("66666666666666666")
 	if err := json.Unmarshal(result.(json.RawMessage), &have); err != nil {
 		log.Crit("main hook failed to unmarshal result %v", "error", err)
 		return
