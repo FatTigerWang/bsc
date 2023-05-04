@@ -882,12 +882,14 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.TransactionArgs, bloc
 	if err != nil {
 		return nil, err
 	}
+	log.Info("trace call called 3")
 	vmctx := core.NewEVMBlockContext(block.Header(), api.chainContext(ctx), nil)
 
 	var traceConfig *TraceConfig
 	if config != nil {
 		traceConfig = &config.TraceConfig
 	}
+	log.Info("trace call called 4")
 	return api.traceTx(ctx, msg, new(Context), vmctx, statedb, traceConfig)
 }
 
@@ -895,6 +897,7 @@ func (api *API) TraceCall(ctx context.Context, args ethapi.TransactionArgs, bloc
 // executes the given message in the provided environment. The return value will
 // be tracer dependent.
 func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Context, vmctx vm.BlockContext, statedb *state.StateDB, config *TraceConfig) (interface{}, error) {
+	log.Info("trace tx called 1")
 	var (
 		tracer    Tracer
 		err       error
@@ -904,6 +907,7 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 	if config == nil {
 		config = &TraceConfig{}
 	}
+	log.Info("trace tx called 2")
 	// Default tracer is the struct logger
 	tracer = logger.NewStructLogger(config.Config)
 	if config.Tracer != nil {
@@ -912,6 +916,7 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 			return nil, err
 		}
 	}
+	log.Info("trace tx called 3")
 	// Define a meaningful timeout of a single transaction trace
 	if config.Timeout != nil {
 		if timeout, err = time.ParseDuration(*config.Timeout); err != nil {
@@ -927,9 +932,10 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 	}()
 	defer cancel()
 
+	log.Info("trace tx called 4")
 	// Run the transaction with tracing enabled.
 	vmenv := vm.NewEVM(vmctx, txContext, statedb, api.backend.ChainConfig(), vm.Config{Debug: true, Tracer: tracer, NoBaseFee: true})
-
+	log.Info("trace tx called 5")
 	if posa, ok := api.backend.Engine().(consensus.PoSA); ok && message.From() == vmctx.Coinbase &&
 		posa.IsSystemContract(message.To()) && message.GasPrice().Cmp(big.NewInt(0)) == 0 {
 		balance := statedb.GetBalance(consensus.SystemAddress)
@@ -938,12 +944,13 @@ func (api *API) traceTx(ctx context.Context, message core.Message, txctx *Contex
 			statedb.AddBalance(vmctx.Coinbase, balance)
 		}
 	}
-
+	log.Info("trace tx called 6")
 	// Call Prepare to clear out the statedb access list
 	statedb.Prepare(txctx.TxHash, txctx.TxIndex)
 	if _, err = core.ApplyMessage(vmenv, message, new(core.GasPool).AddGas(message.Gas())); err != nil {
 		return nil, fmt.Errorf("tracing failed: %w", err)
 	}
+	log.Info("trace tx called 7")
 	return tracer.GetResult()
 }
 
